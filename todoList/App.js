@@ -1,5 +1,5 @@
 import { StatusBar } from 'expo-status-bar';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   StyleSheet,
   Text,
@@ -12,19 +12,33 @@ import {
   ScrollView,
 } from 'react-native';
 import { theme } from './color';
+
+const STORAGE_KEY = '@toDos';
+
 export default function App() {
   const [working, setWorking] = useState(true);
   const [text, setText] = useState('');
   const [toDos, setToDos] = useState({});
+  useEffect(() => {
+    loadToDos();
+  }, []);
   const travel = () => setWorking(false);
   const work = () => setWorking(true);
   const onChangeText = (payload) => setText(payload);
-  const addToDo = () => {
+  const saveToDos = async (toSave) => {
+    await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(toSave));
+  };
+  const loadToDos = async () => {
+    const s = await AsyncStorage.getItem(STORAGE_KEY);
+    setToDos(JSON.parse(s));
+  };
+  const addToDo = async () => {
     if (text === '') {
       return;
     }
-    const newToDos = { ...toDos, [Date.now()]: { text, work: working } };
+    const newToDos = { ...toDos, [Date.now()]: { text, working } };
     setToDos(newToDos);
+    await saveToDos(newToDos);
     setText('');
   };
   return (
@@ -57,11 +71,14 @@ export default function App() {
         />
       </View>
       <ScrollView>
-        {Object.keys(toDos).map((key) => (
-          <View style={styles.toDo} key={key}>
-            <Text style={styles.toDoText}>{toDos[key].text}</Text>
-          </View>
-        ))}
+        {Object.keys(toDos).map(
+          (key) =>
+            toDos[key].working === working && (
+              <View style={styles.toDo} key={key}>
+                <Text style={styles.toDoText}>{toDos[key].text}</Text>
+              </View>
+            )
+        )}
       </ScrollView>
     </View>
   );
@@ -91,7 +108,7 @@ const styles = StyleSheet.create({
     fontSize: 18,
   },
   toDo: {
-    backgroundColor: theme.grey,
+    backgroundColor: theme.toDoBg,
     marginBottom: 10,
     paddingVertical: 20,
     paddingHorizontal: 20,
