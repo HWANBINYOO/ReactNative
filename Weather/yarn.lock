@@ -4338,6 +4338,11 @@ locate-path@^6.0.0:
   dependencies:
     p-locate "^5.0.0"
 
+location@^0.0.1:
+  version "0.0.1"
+  resolved "https://registry.yarnpkg.com/location/-/location-0.0.1.tgz#fa071d21365dd76661e2271ade8ca1314dc6f580"
+  integrity sha512-fDql7RsTtS3A6k6Kk+8Xat83ZtvJcFwUZi5tOAhW2IVSZmBqLf1/0NJqm/iNs5oSXVHSxX4rM5AZVOXu4OqtdQ==
+
 lodash.debounce@^4.0.8:
   version "4.0.8"
   resolved "https://registry.yarnpkg.com/lodash.debounce/-/lodash.debounce-4.0.8.tgz#82d79bff30a67c4005ffd5e2515300ad9ca4d7af"
