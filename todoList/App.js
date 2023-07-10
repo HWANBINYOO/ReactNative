@@ -4,6 +4,7 @@ import {
   StyleSheet,
   Text,
   View,
+  Alert,
   TouchableOpacity,
   TouchableHighlight,
   TouchableWithoutFeedback,
@@ -12,6 +13,7 @@ import {
   ScrollView,
 } from 'react-native';
 import { theme } from './color';
+import { FontAwesome5 } from '@expo/vector-icons';
 
 const STORAGE_KEY = '@toDos';
 
@@ -25,21 +27,40 @@ export default function App() {
   const travel = () => setWorking(false);
   const work = () => setWorking(true);
   const onChangeText = (payload) => setText(payload);
+
   const saveToDos = async (toSave) => {
     await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(toSave));
   };
+
   const loadToDos = async () => {
     const s = await AsyncStorage.getItem(STORAGE_KEY);
     setToDos(JSON.parse(s));
   };
+
   const addToDo = async () => {
     if (text === '') {
       return;
     }
     const newToDos = { ...toDos, [Date.now()]: { text, working } };
     setToDos(newToDos);
-    await saveToDos(newToDos);
     setText('');
+    await saveToDos(newToDos);
+  };
+
+  const deleteToDo = (key) => {
+    Alert.alert('Delete To Do', 'Are you sure?', [
+      { text: 'Cancel' },
+      {
+        text: "I'm Sure",
+        style: 'destructive',
+        onPress: () => {
+          const newToDos = { ...toDos };
+          delete newToDos[key];
+          setToDos(newToDos);
+          saveToDos(newToDos);
+        },
+      },
+    ]);
   };
   return (
     <View style={styles.container}>
@@ -76,6 +97,9 @@ export default function App() {
             toDos[key].working === working && (
               <View style={styles.toDo} key={key}>
                 <Text style={styles.toDoText}>{toDos[key].text}</Text>
+                <TouchableOpacity onPress={() => deleteToDo(key)}>
+                  <FontAwesome5 name="trash" size={18} color={theme.grey} />
+                </TouchableOpacity>
               </View>
             )
         )}
@@ -113,10 +137,13 @@ const styles = StyleSheet.create({
     paddingVertical: 20,
     paddingHorizontal: 20,
     borderRadius: 15,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
   },
   toDoText: {
     color: 'white',
     fontSize: 16,
-    fontWeight: '500',
+    fontWeight: '600',
   },
 });
